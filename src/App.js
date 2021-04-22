@@ -1,23 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
-function App() {
+import Header from './components/Header'
+import Characters from './components/Characters'
+import Search from './components/Search'
+
+import './App.scss';
+
+const App = () => {
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      setIsLoading(true)
+      const result = await axios (`http://api.tvmaze.com/shows?q=${query}`)
+
+      setItems(Array.from(result.data))
+      setIsLoading(false)
+      console.log(result.data)
+    }
+
+    fetchItems();
+  }, [query])
+
+  
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+     <Header />
+     <Search getQuery={(q) => setQuery(q)}/>
+     <Characters isLoading={isLoading} items={items} />
     </div>
   );
 }
